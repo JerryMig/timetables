@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>台鐵時刻查詢</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="search-panel" aria-labelledby="page-title">
+        <div class="title-block">
+          <p class="eyebrow">TRA Timetable</p>
+          <h1 id="page-title">台鐵時刻查詢</h1>
+          <p class="subtitle">輸入起訖站、日期與出發時間，查詢台鐵直達班次。</p>
+        </div>
+
+        <form id="search-form" class="search-form">
+          <div class="field-grid">
+            <label class="field">
+              <span>起站</span>
+              <input id="from-station" name="fromStation" list="station-options" placeholder="例如：台北" autocomplete="off" required />
+            </label>
+
+            <button class="swap-button" id="swap-button" type="button" aria-label="交換起訖站" title="交換起訖站">⇄</button>
+
+            <label class="field">
+              <span>訖站</span>
+              <input id="to-station" name="toStation" list="station-options" placeholder="例如：台中" autocomplete="off" required />
+            </label>
+
+            <label class="field">
+              <span>日期</span>
+              <input id="travel-date" name="travelDate" type="date" required />
+            </label>
+
+            <label class="field">
+              <span>出發時間</span>
+              <input id="travel-time" name="travelTime" type="time" required />
+            </label>
+
+            <label class="field">
+              <span>筆數</span>
+              <select id="result-limit" name="resultLimit">
+                <option value="10">10 筆</option>
+                <option value="20" selected>20 筆</option>
+                <option value="40">40 筆</option>
+              </select>
+            </label>
+          </div>
+
+          <datalist id="station-options"></datalist>
+
+          <div class="actions">
+            <button class="primary-button" type="submit">查詢班次</button>
+            <p id="status-message" class="status-message" role="status"></p>
+          </div>
+
+          <div id="recent-searches" class="recent-searches hidden" aria-label="最近查詢">
+            <span>最近查詢</span>
+            <div id="recent-search-list" class="recent-search-list"></div>
+          </div>
+
+          <div class="route-shortcuts" aria-label="常用路線">
+            <span>常用路線</span>
+            <div id="common-route-list" class="route-shortcut-list"></div>
+          </div>
+        </form>
+      </section>
+
+      <section class="results-panel" aria-live="polite">
+        <div class="results-header">
+          <div>
+            <p class="eyebrow">Results</p>
+            <h2>查詢結果</h2>
+          </div>
+          <span id="result-count" class="count-pill">0 筆</span>
+        </div>
+
+        <div id="empty-state" class="empty-state">
+          <h3>尚未查詢</h3>
+          <p>填入起訖站後送出，班次會依出發時間由早到晚排列。</p>
+        </div>
+
+        <div id="results-list" class="results-list"></div>
+      </section>
+    </main>
+
+    <template id="trip-template">
+      <article class="trip-card">
+        <div class="trip-main">
+          <div>
+            <p class="train-type"></p>
+            <h3 class="train-route"></h3>
+          </div>
+          <span class="train-no"></span>
+        </div>
+        <div class="time-row">
+          <div>
+            <span class="time-label">出發</span>
+            <strong class="departure-time"></strong>
+            <span class="departure-station"></span>
+          </div>
+          <div class="duration"></div>
+          <div>
+            <span class="time-label">抵達</span>
+            <strong class="arrival-time"></strong>
+            <span class="arrival-station"></span>
+          </div>
+        </div>
+        <p class="trip-note"></p>
+      </article>
+    </template>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
