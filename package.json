@@ -8,6 +8,11 @@
     "start": "node server.js",
     "dev": "node --watch server.js"
   },
+  "engines": {
+    "node": "22.x",
+    "npm": "10.x"
+  },
+  "packageManager": "npm@10.9.2",
   "keywords": [],
   "author": "",
   "license": "ISC",
