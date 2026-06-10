@@ -10,16 +10,15 @@ const elements = {
   resultCount: document.querySelector('#result-count'),
   emptyState: document.querySelector('#empty-state'),
   resultsList: document.querySelector('#results-list'),
-  recentSearches: document.querySelector('#recent-searches'),
-  recentSearchList: document.querySelector('#recent-search-list'),
   commonRouteList: document.querySelector('#common-route-list'),
+  addCommonRoute: document.querySelector('#add-common-route'),
   swapButton: document.querySelector('#swap-button'),
   submitButton: document.querySelector('.primary-button'),
   tripTemplate: document.querySelector('#trip-template'),
 };
 
-const recentSearchStorageKey = 'tra-timetable-recent-searches';
-const commonRoutes = [
+const commonRouteStorageKey = 'tra-timetable-common-routes-v2';
+const defaultCommonRoutes = [
   { fromId: '1000', fromName: '台北', toId: '1080', toName: '桃園' },
   { fromId: '1080', fromName: '桃園', toId: '1000', toName: '台北' },
   { fromId: '1080', fromName: '桃園', toId: '0990', toName: '松山' },
@@ -39,10 +38,9 @@ async function init() {
 
   elements.swapButton.addEventListener('click', swapStations);
   elements.form.addEventListener('submit', handleSearch);
-  elements.recentSearchList.addEventListener('click', handleRecentSearchClick);
   elements.commonRouteList.addEventListener('click', handleRouteShortcutClick);
+  elements.addCommonRoute.addEventListener('click', addCurrentRouteToShortcuts);
   renderCommonRoutes();
-  renderRecentSearches();
 
   await loadStatus();
   await loadStations();
@@ -79,7 +77,6 @@ async function loadStations() {
     }
 
     renderCommonRoutes();
-    renderRecentSearches();
     setStatus(`已載入 ${stations.length} 個台鐵車站。`);
   } catch (error) {
     setStatus(error.message, 'error');
@@ -115,7 +112,6 @@ async function handleSearch(event) {
   try {
     setLoading(true, '查詢班次中...');
     renderTrips([]);
-    rememberSearch(from, to);
 
     const data = await getJson(`/api/timetable?${params}`);
     renderTrips(data.trips || []);
@@ -131,20 +127,16 @@ async function handleSearch(event) {
 }
 
 function handleRouteShortcutClick(event) {
+  const deleteButton = event.target.closest('.route-delete-button');
+  if (deleteButton) {
+    deleteCommonRoute(deleteButton.dataset.fromId, deleteButton.dataset.toId);
+    return;
+  }
+
   const button = event.target.closest('.route-shortcut-button');
   if (!button) {
     return;
   }
-
-  applyRouteAndSearch(button.dataset.fromId, button.dataset.toId);
-}
-
-function handleRecentSearchClick(event) {
-  const button = event.target.closest('.recent-search-button');
-  if (!button) {
-    return;
-  }
-
   applyRouteAndSearch(button.dataset.fromId, button.dataset.toId);
 }
 
@@ -163,59 +155,114 @@ function applyRouteAndSearch(fromId, toId) {
 }
 
 function renderCommonRoutes() {
+  const commonRoutes = loadCommonRoutes();
   elements.commonRouteList.textContent = '';
 
+  if (commonRoutes.length === 0) {
+    const empty = document.createElement('p');
+    empty.className = 'route-shortcut-empty';
+    empty.textContent = '尚未加入常用路線。';
+    elements.commonRouteList.append(empty);
+    return;
+  }
+
   for (const route of commonRoutes) {
+    const item = document.createElement('span');
+    item.className = 'route-shortcut-item';
+
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'route-shortcut-button';
     button.dataset.fromId = route.fromId;
     button.dataset.toId = route.toId;
     button.textContent = `${route.fromName} → ${route.toName}`;
-    elements.commonRouteList.append(button);
+
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.className = 'route-delete-button';
+    deleteButton.dataset.fromId = route.fromId;
+    deleteButton.dataset.toId = route.toId;
+    deleteButton.setAttribute('aria-label', `刪除 ${route.fromName} 到 ${route.toName}`);
+    deleteButton.title = '刪除';
+    deleteButton.textContent = '×';
+
+    item.append(button, deleteButton);
+    elements.commonRouteList.append(item);
   }
 }
 
-function rememberSearch(from, to) {
-  const nextSearch = {
+function addCurrentRouteToShortcuts() {
+  const from = resolveStation(elements.fromStation.value);
+  const to = resolveStation(elements.toStation.value);
+
+  if (!from || !to) {
+    setStatus('請先從建議清單選擇正確的起站與訖站，再加入常用路線。', 'error');
+    return;
+  }
+
+  if (from.id === to.id) {
+    setStatus('起站與訖站不能相同。', 'error');
+    return;
+  }
+
+  const routes = loadCommonRoutes();
+  const exists = routes.some((route) => route.fromId === from.id && route.toId === to.id);
+  if (exists) {
+    setStatus(`${from.name} 到 ${to.name} 已在常用路線中。`, 'warning');
+    return;
+  }
+
+  routes.push({
     fromId: from.id,
-    fromName: from.name,
+    fromName: displayStationName(from),
     toId: to.id,
-    toName: to.name,
-  };
-
-  const searches = loadRecentSearches()
-    .filter((search) => search.fromId !== from.id || search.toId !== to.id)
-    .filter((search) => search.fromId && search.toId);
-
-  searches.unshift(nextSearch);
-  localStorage.setItem(recentSearchStorageKey, JSON.stringify(searches.slice(0, 3)));
-  renderRecentSearches();
+    toName: displayStationName(to),
+  });
+  saveCommonRoutes(routes);
+  renderCommonRoutes();
+  setStatus(`已加入 ${from.name} 到 ${to.name} 常用路線。`);
 }
 
-function renderRecentSearches() {
-  const searches = loadRecentSearches();
-  elements.recentSearchList.textContent = '';
-  elements.recentSearches.classList.toggle('hidden', searches.length === 0);
+function deleteCommonRoute(fromId, toId) {
+  const routes = loadCommonRoutes();
+  const nextRoutes = routes.filter((route) => route.fromId !== fromId || route.toId !== toId);
 
-  for (const search of searches) {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'recent-search-button';
-    button.dataset.fromId = search.fromId;
-    button.dataset.toId = search.toId;
-    button.textContent = `${search.fromName} → ${search.toName}`;
-    elements.recentSearchList.append(button);
-  }
+  saveCommonRoutes(nextRoutes);
+  renderCommonRoutes();
+  setStatus('已刪除常用路線。');
 }
 
-function loadRecentSearches() {
+function loadCommonRoutes() {
   try {
-    const parsed = JSON.parse(localStorage.getItem(recentSearchStorageKey) || '[]');
-    return Array.isArray(parsed) ? parsed.slice(0, 3) : [];
+    const saved = localStorage.getItem(commonRouteStorageKey);
+    if (!saved) {
+      return cloneDefaultCommonRoutes();
+    }
+
+    const parsed = JSON.parse(saved);
+    if (!Array.isArray(parsed)) {
+      return cloneDefaultCommonRoutes();
+    }
+
+    return parsed
+      .filter((route) => route.fromId && route.toId && route.fromName && route.toName)
+      .map((route) => ({
+        fromId: String(route.fromId),
+        fromName: String(route.fromName),
+        toId: String(route.toId),
+        toName: String(route.toName),
+      }));
   } catch {
-    return [];
+    return cloneDefaultCommonRoutes();
   }
+}
+
+function saveCommonRoutes(routes) {
+  localStorage.setItem(commonRouteStorageKey, JSON.stringify(routes));
+}
+
+function cloneDefaultCommonRoutes() {
+  return defaultCommonRoutes.map((route) => ({ ...route }));
 }
 
 function renderTrips(trips) {
@@ -279,6 +326,10 @@ function swapStations() {
 
 function stationOptionValue(station) {
   return station.englishName ? `${station.name} (${station.englishName})` : station.name;
+}
+
+function displayStationName(station) {
+  return station.name === '臺北' ? '台北' : station.name;
 }
 
 function setLoading(isLoading, message = '') {

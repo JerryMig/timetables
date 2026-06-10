@@ -180,10 +180,8 @@ h2 {
   color: var(--warning);
 }
 
-.recent-searches,
 .route-shortcuts {
-  display: flex;
-  align-items: center;
+  display: grid;
   gap: 10px;
   margin-top: 18px;
   color: var(--muted);
@@ -191,18 +189,38 @@ h2 {
   font-weight: 700;
 }
 
-.recent-search-list,
+.route-shortcut-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .route-shortcut-list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.recent-search-button,
-.route-shortcut-button {
-  min-height: 34px;
+.route-shortcut-empty {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.route-shortcut-item {
+  display: inline-flex;
+  overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 999px;
+  background: #fff;
+}
+
+.route-shortcut-button,
+.route-delete-button,
+.secondary-button {
+  min-height: 34px;
+  border: 0;
   background: #fff;
   color: var(--text);
   cursor: pointer;
@@ -210,11 +228,34 @@ h2 {
   padding: 0 12px;
 }
 
-.recent-search-button:hover,
-.route-shortcut-button:hover {
+.secondary-button {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--accent-strong);
+  white-space: nowrap;
+}
+
+.route-delete-button {
+  border-left: 1px solid var(--line);
+  color: var(--danger);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.route-shortcut-item:hover,
+.secondary-button:hover {
   border-color: var(--accent);
+}
+
+.route-shortcut-button:hover,
+.route-delete-button:hover,
+.secondary-button:hover {
   background: var(--accent-soft);
   color: var(--accent-strong);
+}
+
+.route-delete-button:hover {
+  color: var(--danger);
 }
 
 .results-panel {
@@ -371,8 +412,8 @@ h2 {
   }
 
   .actions,
-  .recent-searches,
   .route-shortcuts,
+  .route-shortcut-header,
   .results-header,
   .trip-main,
   .time-row {
