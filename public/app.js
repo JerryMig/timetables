@@ -2,16 +2,20 @@ const elements = {
   form: document.querySelector('#search-form'),
   fromStation: document.querySelector('#from-station'),
   toStation: document.querySelector('#to-station'),
+  commonFromStation: document.querySelector('#common-from-station'),
+  commonToStation: document.querySelector('#common-to-station'),
   stationOptions: document.querySelector('#station-options'),
   travelDate: document.querySelector('#travel-date'),
   travelTime: document.querySelector('#travel-time'),
-  resultLimit: document.querySelector('#result-limit'),
   statusMessage: document.querySelector('#status-message'),
   resultCount: document.querySelector('#result-count'),
   emptyState: document.querySelector('#empty-state'),
   resultsList: document.querySelector('#results-list'),
   commonRouteList: document.querySelector('#common-route-list'),
+  commonRouteEditor: document.querySelector('#common-route-editor'),
   addCommonRoute: document.querySelector('#add-common-route'),
+  saveCommonRoute: document.querySelector('#save-common-route'),
+  cancelCommonRoute: document.querySelector('#cancel-common-route'),
   swapButton: document.querySelector('#swap-button'),
   submitButton: document.querySelector('.primary-button'),
   tripTemplate: document.querySelector('#trip-template'),
@@ -39,7 +43,9 @@ async function init() {
   elements.swapButton.addEventListener('click', swapStations);
   elements.form.addEventListener('submit', handleSearch);
   elements.commonRouteList.addEventListener('click', handleRouteShortcutClick);
-  elements.addCommonRoute.addEventListener('click', addCurrentRouteToShortcuts);
+  elements.addCommonRoute.addEventListener('click', showCommonRouteEditor);
+  elements.saveCommonRoute.addEventListener('click', addCommonRouteFromEditor);
+  elements.cancelCommonRoute.addEventListener('click', hideCommonRouteEditor);
   renderCommonRoutes();
 
   await loadStatus();
@@ -106,7 +112,7 @@ async function handleSearch(event) {
     to: to.id,
     date: elements.travelDate.value,
     time: elements.travelTime.value,
-    limit: elements.resultLimit.value,
+    limit: '20',
   });
 
   try {
@@ -191,12 +197,25 @@ function renderCommonRoutes() {
   }
 }
 
-function addCurrentRouteToShortcuts() {
-  const from = resolveStation(elements.fromStation.value);
-  const to = resolveStation(elements.toStation.value);
+function showCommonRouteEditor() {
+  elements.commonRouteEditor.classList.remove('hidden');
+  elements.commonFromStation.value = '';
+  elements.commonToStation.value = '';
+  elements.commonFromStation.focus();
+}
+
+function hideCommonRouteEditor() {
+  elements.commonRouteEditor.classList.add('hidden');
+  elements.commonFromStation.value = '';
+  elements.commonToStation.value = '';
+}
+
+function addCommonRouteFromEditor() {
+  const from = resolveStation(elements.commonFromStation.value);
+  const to = resolveStation(elements.commonToStation.value);
 
   if (!from || !to) {
-    setStatus('請先從建議清單選擇正確的起站與訖站，再加入常用路線。', 'error');
+    setStatus('請先選擇正確的常用路線起站與訖站。', 'error');
     return;
   }
 
@@ -220,6 +239,7 @@ function addCurrentRouteToShortcuts() {
   });
   saveCommonRoutes(routes);
   renderCommonRoutes();
+  hideCommonRouteEditor();
   setStatus(`已加入 ${from.name} 到 ${to.name} 常用路線。`);
 }
 

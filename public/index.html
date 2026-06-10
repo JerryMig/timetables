@@ -12,10 +12,29 @@
         <div class="title-block">
           <p class="eyebrow">TRA Timetable</p>
           <h1 id="page-title">台鐵時刻查詢</h1>
-          <p class="subtitle">輸入起訖站、日期與出發時間，查詢台鐵直達班次。</p>
         </div>
 
         <form id="search-form" class="search-form">
+          <div class="route-shortcuts" aria-label="常用路線">
+            <div class="route-shortcut-header">
+              <span>常用路線</span>
+              <button id="add-common-route" class="secondary-button" type="button">新增常用路線</button>
+            </div>
+            <div id="common-route-list" class="route-shortcut-list"></div>
+            <div id="common-route-editor" class="route-editor hidden">
+              <label class="field">
+                <span>起站</span>
+                <input id="common-from-station" list="station-options" placeholder="例如：台北" autocomplete="off" />
+              </label>
+              <label class="field">
+                <span>訖站</span>
+                <input id="common-to-station" list="station-options" placeholder="例如：桃園" autocomplete="off" />
+              </label>
+              <button id="save-common-route" class="secondary-button" type="button">加入</button>
+              <button id="cancel-common-route" class="secondary-button quiet-button" type="button">取消</button>
+            </div>
+          </div>
+
           <div class="field-grid">
             <label class="field">
               <span>起站</span>
@@ -38,15 +57,6 @@
               <span>出發時間</span>
               <input id="travel-time" name="travelTime" type="time" required />
             </label>
-
-            <label class="field">
-              <span>筆數</span>
-              <select id="result-limit" name="resultLimit">
-                <option value="10">10 筆</option>
-                <option value="20" selected>20 筆</option>
-                <option value="40">40 筆</option>
-              </select>
-            </label>
           </div>
 
           <datalist id="station-options"></datalist>
@@ -54,14 +64,6 @@
           <div class="actions">
             <button class="primary-button" type="submit">查詢班次</button>
             <p id="status-message" class="status-message" role="status"></p>
-          </div>
-
-          <div class="route-shortcuts" aria-label="常用路線">
-            <div class="route-shortcut-header">
-              <span>常用路線</span>
-              <button id="add-common-route" class="secondary-button" type="button">加入目前路線</button>
-            </div>
-            <div id="common-route-list" class="route-shortcut-list"></div>
           </div>
         </form>
       </section>

@@ -84,16 +84,12 @@ h2 {
   font-size: 1.5rem;
 }
 
-.subtitle {
-  margin-bottom: 26px;
-  color: var(--muted);
-}
-
 .field-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) 170px 150px 120px;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) 170px 150px;
   gap: 14px;
   align-items: end;
+  margin-top: 22px;
 }
 
 .field {
@@ -202,6 +198,16 @@ h2 {
   gap: 8px;
 }
 
+.route-editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: end;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+}
+
 .route-shortcut-empty {
   margin: 0;
   color: var(--muted);
@@ -233,6 +239,10 @@ h2 {
   border-radius: 8px;
   color: var(--accent-strong);
   white-space: nowrap;
+}
+
+.quiet-button {
+  color: var(--muted);
 }
 
 .route-delete-button {
@@ -389,6 +399,10 @@ h2 {
   .field-grid {
     grid-template-columns: 1fr 52px 1fr;
   }
+
+  .route-editor {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (max-width: 640px) {
@@ -403,6 +417,10 @@ h2 {
   }
 
   .field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .route-editor {
     grid-template-columns: 1fr;
   }
 
