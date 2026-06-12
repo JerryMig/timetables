@@ -84,12 +84,50 @@ h2 {
   font-size: 1.5rem;
 }
 
+.view-switch {
+  display: inline-flex;
+  gap: 4px;
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 4px;
+}
+
+.view-switch-button {
+  min-height: 36px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 800;
+  padding: 0 14px;
+}
+
+.view-switch-button.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.route-view {
+  margin-top: 18px;
+}
+
 .field-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) 170px 150px;
+  grid-template-columns: 170px 150px;
   gap: 14px;
   align-items: end;
   margin-top: 22px;
+}
+
+.custom-route-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 14px;
+  align-items: end;
+  margin-top: 10px;
 }
 
 .field {
@@ -264,6 +302,11 @@ h2 {
   color: var(--accent-strong);
 }
 
+.route-shortcut-button.selected {
+  background: var(--accent);
+  color: #fff;
+}
+
 .route-delete-button:hover {
   color: var(--danger);
 }
@@ -311,10 +354,22 @@ h2 {
 }
 
 .trip-card {
-  border: 1px solid var(--line);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #b7c9d8;
   border-radius: 8px;
   padding: 18px;
-  background: #fff;
+  background: #edf5fb;
+}
+
+.trip-card::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 5px;
+  background: var(--accent);
+  content: "";
 }
 
 .trip-main,
@@ -396,7 +451,7 @@ h2 {
 }
 
 @media (max-width: 920px) {
-  .field-grid {
+  .custom-route-grid {
     grid-template-columns: 1fr 52px 1fr;
   }
 
@@ -420,6 +475,10 @@ h2 {
     grid-template-columns: 1fr;
   }
 
+  .custom-route-grid {
+    grid-template-columns: 1fr;
+  }
+
   .route-editor {
     grid-template-columns: 1fr;
   }
@@ -430,6 +489,7 @@ h2 {
   }
 
   .actions,
+  .view-switch,
   .route-shortcuts,
   .route-shortcut-header,
   .results-header,

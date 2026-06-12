@@ -13,6 +13,10 @@ const elements = {
   resultsList: document.querySelector('#results-list'),
   commonRouteList: document.querySelector('#common-route-list'),
   commonRouteEditor: document.querySelector('#common-route-editor'),
+  commonRouteView: document.querySelector('#common-route-view'),
+  customRouteView: document.querySelector('#custom-route-view'),
+  commonModeButton: document.querySelector('#common-mode-button'),
+  customModeButton: document.querySelector('#custom-mode-button'),
   addCommonRoute: document.querySelector('#add-common-route'),
   saveCommonRoute: document.querySelector('#save-common-route'),
   cancelCommonRoute: document.querySelector('#cancel-common-route'),
@@ -32,6 +36,8 @@ const defaultCommonRoutes = [
 let stations = [];
 let stationByOptionValue = new Map();
 let stationById = new Map();
+let currentView = 'common';
+let selectedCommonRoute = null;
 
 init();
 
@@ -43,6 +49,8 @@ async function init() {
   elements.swapButton.addEventListener('click', swapStations);
   elements.form.addEventListener('submit', handleSearch);
   elements.commonRouteList.addEventListener('click', handleRouteShortcutClick);
+  elements.commonModeButton.addEventListener('click', () => setView('common'));
+  elements.customModeButton.addEventListener('click', () => setView('custom'));
   elements.addCommonRoute.addEventListener('click', showCommonRouteEditor);
   elements.saveCommonRoute.addEventListener('click', addCommonRouteFromEditor);
   elements.cancelCommonRoute.addEventListener('click', hideCommonRouteEditor);
@@ -94,13 +102,13 @@ async function loadStations() {
 async function handleSearch(event) {
   event.preventDefault();
 
-  const from = resolveStation(elements.fromStation.value);
-  const to = resolveStation(elements.toStation.value);
+  const route = currentView === 'common' ? resolveSelectedCommonRoute() : resolveCustomRoute();
 
-  if (!from || !to) {
-    setStatus('請從建議清單選擇正確的起站與訖站。', 'error');
+  if (!route) {
     return;
   }
+
+  const { from, to } = route;
 
   if (from.id === to.id) {
     setStatus('起站與訖站不能相同。', 'error');
@@ -143,21 +151,54 @@ function handleRouteShortcutClick(event) {
   if (!button) {
     return;
   }
-  applyRouteAndSearch(button.dataset.fromId, button.dataset.toId);
+
+  selectCommonRoute(button.dataset.fromId, button.dataset.toId);
 }
 
-function applyRouteAndSearch(fromId, toId) {
-  const from = stationById.get(fromId);
-  const to = stationById.get(toId);
+function setView(view) {
+  currentView = view;
+  const isCommon = view === 'common';
 
-  if (!from || !to) {
-    setStatus('這筆路線的車站資料尚未載入，請稍後再試。', 'error');
-    return;
+  elements.commonRouteView.classList.toggle('hidden', !isCommon);
+  elements.customRouteView.classList.toggle('hidden', isCommon);
+  elements.commonModeButton.classList.toggle('active', isCommon);
+  elements.customModeButton.classList.toggle('active', !isCommon);
+  elements.commonModeButton.setAttribute('aria-selected', String(isCommon));
+  elements.customModeButton.setAttribute('aria-selected', String(!isCommon));
+}
+
+function resolveSelectedCommonRoute() {
+  if (!selectedCommonRoute) {
+    setStatus('請先選擇一筆常用路線。', 'error');
+    return null;
   }
 
-  elements.fromStation.value = stationOptionValue(from);
-  elements.toStation.value = stationOptionValue(to);
-  elements.form.requestSubmit();
+  const from = stationById.get(selectedCommonRoute.fromId);
+  const to = stationById.get(selectedCommonRoute.toId);
+
+  if (!from || !to) {
+    setStatus('這筆常用路線的車站資料尚未載入，請稍後再試。', 'error');
+    return null;
+  }
+
+  return { from, to };
+}
+
+function resolveCustomRoute() {
+  const from = resolveStation(elements.fromStation.value);
+  const to = resolveStation(elements.toStation.value);
+
+  if (!from || !to) {
+    setStatus('請從建議清單選擇正確的起站與訖站。', 'error');
+    return null;
+  }
+
+  return { from, to };
+}
+
+function selectCommonRoute(fromId, toId) {
+  selectedCommonRoute = { fromId, toId };
+  renderCommonRoutes();
 }
 
 function renderCommonRoutes() {
@@ -165,11 +206,19 @@ function renderCommonRoutes() {
   elements.commonRouteList.textContent = '';
 
   if (commonRoutes.length === 0) {
+    selectedCommonRoute = null;
     const empty = document.createElement('p');
     empty.className = 'route-shortcut-empty';
     empty.textContent = '尚未加入常用路線。';
     elements.commonRouteList.append(empty);
     return;
+  }
+
+  if (
+    !selectedCommonRoute ||
+    !commonRoutes.some((route) => route.fromId === selectedCommonRoute.fromId && route.toId === selectedCommonRoute.toId)
+  ) {
+    selectedCommonRoute = { fromId: commonRoutes[0].fromId, toId: commonRoutes[0].toId };
   }
 
   for (const route of commonRoutes) {
@@ -182,6 +231,11 @@ function renderCommonRoutes() {
     button.dataset.fromId = route.fromId;
     button.dataset.toId = route.toId;
     button.textContent = `${route.fromName} → ${route.toName}`;
+    button.classList.toggle(
+      'selected',
+      selectedCommonRoute?.fromId === route.fromId && selectedCommonRoute?.toId === route.toId,
+    );
+    button.setAttribute('aria-pressed', String(button.classList.contains('selected')));
 
     const deleteButton = document.createElement('button');
     deleteButton.type = 'button';
@@ -238,6 +292,7 @@ function addCommonRouteFromEditor() {
     toName: displayStationName(to),
   });
   saveCommonRoutes(routes);
+  selectedCommonRoute = { fromId: from.id, toId: to.id };
   renderCommonRoutes();
   hideCommonRouteEditor();
   setStatus(`已加入 ${from.name} 到 ${to.name} 常用路線。`);
@@ -248,6 +303,9 @@ function deleteCommonRoute(fromId, toId) {
   const nextRoutes = routes.filter((route) => route.fromId !== fromId || route.toId !== toId);
 
   saveCommonRoutes(nextRoutes);
+  if (selectedCommonRoute?.fromId === fromId && selectedCommonRoute?.toId === toId) {
+    selectedCommonRoute = null;
+  }
   renderCommonRoutes();
   setStatus('已刪除常用路線。');
 }
