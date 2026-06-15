@@ -326,8 +326,10 @@ function renderTrips(trips) {
     return;
   }
 
-  for (const trip of trips) {
+  trips.forEach((trip, index) => {
     const card = elements.tripTemplate.content.cloneNode(true);
+    const nextBadge = card.querySelector('.next-badge');
+    nextBadge.classList.toggle('hidden', index !== 0);
     card.querySelector('.train-type').textContent = simplifyTrainType(trip.trainType);
     card.querySelector('.train-route').textContent = `${trip.departureStationName || '起站'} → ${trip.arrivalStationName || '訖站'}`;
     card.querySelector('.train-no').textContent = trip.trainNo ? `車次 ${trip.trainNo}` : '車次未提供';
@@ -338,7 +340,7 @@ function renderTrips(trips) {
     card.querySelector('.duration').textContent = formatDuration(trip.durationMinutes, trip.stopCount);
 
     elements.resultsList.append(card);
-  }
+  });
 }
 
 function simplifyTrainType(trainType) {
