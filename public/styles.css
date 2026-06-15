@@ -84,32 +84,6 @@ h2 {
   font-size: 1.5rem;
 }
 
-.view-switch {
-  display: inline-flex;
-  gap: 4px;
-  margin-top: 18px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fff;
-  padding: 4px;
-}
-
-.view-switch-button {
-  min-height: 36px;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--muted);
-  cursor: pointer;
-  font-weight: 800;
-  padding: 0 14px;
-}
-
-.view-switch-button.active {
-  background: var(--accent);
-  color: #fff;
-}
-
 .route-view {
   margin-top: 18px;
 }
@@ -120,14 +94,6 @@ h2 {
   gap: 14px;
   align-items: end;
   margin-top: 22px;
-}
-
-.custom-route-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  gap: 14px;
-  align-items: end;
-  margin-top: 10px;
 }
 
 .field {
@@ -154,23 +120,6 @@ h2 {
 .field select:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.swap-button {
-  width: 46px;
-  height: 46px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fff;
-  color: var(--accent-strong);
-  cursor: pointer;
-  font-size: 1.3rem;
-  font-weight: 800;
-}
-
-.swap-button:hover {
-  border-color: var(--accent);
-  background: var(--accent-soft);
 }
 
 .actions {
@@ -246,6 +195,10 @@ h2 {
   padding: 12px;
 }
 
+.add-route-button {
+  justify-self: start;
+}
+
 .route-shortcut-empty {
   margin: 0;
   color: var(--muted);
@@ -283,6 +236,19 @@ h2 {
   color: var(--muted);
 }
 
+.icon-button {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
 .route-delete-button {
   border-left: 1px solid var(--line);
   color: var(--danger);
@@ -309,6 +275,39 @@ h2 {
 
 .route-delete-button:hover {
   color: var(--danger);
+}
+
+.route-dialog {
+  width: min(420px, calc(100% - 32px));
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0;
+  color: var(--text);
+}
+
+.route-dialog::backdrop {
+  background: rgba(24, 33, 47, 0.35);
+}
+
+.route-dialog-form {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.dialog-header,
+.dialog-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.dialog-header {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dialog-actions {
+  justify-content: end;
 }
 
 .results-panel {
@@ -451,10 +450,6 @@ h2 {
 }
 
 @media (max-width: 920px) {
-  .custom-route-grid {
-    grid-template-columns: 1fr 52px 1fr;
-  }
-
   .route-editor {
     grid-template-columns: 1fr 1fr;
   }
@@ -497,18 +492,6 @@ h2 {
     font-size: 1.25rem;
   }
 
-  .view-switch {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    width: 100%;
-    margin-top: 16px;
-  }
-
-  .view-switch-button {
-    min-height: 42px;
-    padding: 0 10px;
-  }
-
   .route-view,
   .route-shortcuts,
   .field-grid,
@@ -521,18 +504,9 @@ h2 {
     gap: 10px;
   }
 
-  .custom-route-grid {
-    grid-template-columns: 1fr;
-  }
-
   .route-editor {
     grid-template-columns: 1fr;
     padding: 10px;
-  }
-
-  .swap-button {
-    justify-self: end;
-    transform: rotate(90deg);
   }
 
   .actions,
@@ -552,6 +526,10 @@ h2 {
 
   .secondary-button {
     min-height: 40px;
+  }
+
+  .add-route-button {
+    width: 100%;
   }
 
   .route-shortcut-list {
@@ -604,5 +582,18 @@ h2 {
   .duration {
     min-width: 0;
     text-align: left;
+  }
+
+  .route-dialog {
+    width: calc(100% - 24px);
+  }
+
+  .route-dialog-form {
+    padding: 16px;
+  }
+
+  .dialog-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
 }

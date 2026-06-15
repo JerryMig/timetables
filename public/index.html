@@ -15,49 +15,11 @@
         </div>
 
         <form id="search-form" class="search-form">
-          <div class="view-switch" role="tablist" aria-label="查詢模式">
-            <button id="common-mode-button" class="view-switch-button active" type="button" data-view="common" role="tab" aria-selected="true">常用路線</button>
-            <button id="custom-mode-button" class="view-switch-button" type="button" data-view="custom" role="tab" aria-selected="false">自訂路線</button>
-          </div>
-
-          <section id="common-route-view" class="route-view" aria-label="常用路線查詢">
+          <section class="route-view" aria-label="常用路線查詢">
             <div class="route-shortcuts" aria-label="常用路線">
-              <div class="route-shortcut-header">
-                <span>選擇常用路線</span>
-                <button id="add-common-route" class="secondary-button" type="button">新增常用路線</button>
-              </div>
+              <span>常用路線</span>
               <div id="common-route-list" class="route-shortcut-list"></div>
-              <div id="common-route-editor" class="route-editor hidden">
-                <label class="field">
-                  <span>起站</span>
-                  <input id="common-from-station" list="station-options" placeholder="例如：台北" autocomplete="off" />
-                </label>
-                <label class="field">
-                  <span>訖站</span>
-                  <input id="common-to-station" list="station-options" placeholder="例如：桃園" autocomplete="off" />
-                </label>
-                <button id="save-common-route" class="secondary-button" type="button">加入</button>
-                <button id="cancel-common-route" class="secondary-button quiet-button" type="button">取消</button>
-              </div>
-            </div>
-          </section>
-
-          <section id="custom-route-view" class="route-view hidden" aria-label="自訂路線查詢">
-            <div class="route-shortcut-header">
-              <span>選擇起訖站</span>
-            </div>
-            <div class="custom-route-grid">
-              <label class="field">
-                <span>起站</span>
-                <input id="from-station" name="fromStation" list="station-options" placeholder="例如：台北" autocomplete="off" />
-              </label>
-
-              <button class="swap-button" id="swap-button" type="button" aria-label="交換起訖站" title="交換起訖站">⇄</button>
-
-              <label class="field">
-                <span>訖站</span>
-                <input id="to-station" name="toStation" list="station-options" placeholder="例如：台中" autocomplete="off" />
-              </label>
+              <button id="add-common-route" class="secondary-button add-route-button" type="button">新增常用路線</button>
             </div>
           </section>
 
@@ -125,6 +87,27 @@
         <p class="trip-note"></p>
       </article>
     </template>
+
+    <dialog id="common-route-dialog" class="route-dialog">
+      <form class="route-dialog-form" method="dialog">
+        <div class="dialog-header">
+          <h2>新增常用路線</h2>
+          <button id="cancel-common-route" class="icon-button" type="button" aria-label="關閉">×</button>
+        </div>
+        <label class="field">
+          <span>起站</span>
+          <input id="common-from-station" list="station-options" placeholder="例如：台北" autocomplete="off" />
+        </label>
+        <label class="field">
+          <span>訖站</span>
+          <input id="common-to-station" list="station-options" placeholder="例如：桃園" autocomplete="off" />
+        </label>
+        <div class="dialog-actions">
+          <button id="save-common-route" class="primary-button" type="button">加入</button>
+          <button class="secondary-button quiet-button" type="button" data-close-dialog>取消</button>
+        </div>
+      </form>
+    </dialog>
 
     <script src="/app.js" type="module"></script>
   </body>
