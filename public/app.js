@@ -6,7 +6,6 @@ const elements = {
   travelDate: document.querySelector('#travel-date'),
   travelTime: document.querySelector('#travel-time'),
   statusMessage: document.querySelector('#status-message'),
-  resultCount: document.querySelector('#result-count'),
   emptyState: document.querySelector('#empty-state'),
   resultsList: document.querySelector('#results-list'),
   commonRouteList: document.querySelector('#common-route-list'),
@@ -111,7 +110,7 @@ async function handleSearch(event) {
     to: to.id,
     date: elements.travelDate.value,
     time: elements.travelTime.value,
-    limit: '20',
+    limit: '30',
   });
 
   try {
@@ -122,7 +121,7 @@ async function handleSearch(event) {
     renderTrips(data.trips || []);
 
     const label = `${from.name} 到 ${to.name}`;
-    setStatus(data.count > 0 ? `已找到 ${data.count} 筆 ${label} 班次。` : `${label} 在指定時間後沒有直達班次。`);
+    setStatus(data.count > 0 ? `已找到 ${label} 班次。` : `${label} 在指定時間後沒有直達班次。`);
   } catch (error) {
     setStatus(error.message, 'error');
     renderTrips([]);
@@ -226,7 +225,6 @@ function showCommonRouteDialog() {
   } else {
     elements.commonRouteDialog.setAttribute('open', '');
   }
-  requestAnimationFrame(() => elements.commonFromStation.focus());
 }
 
 function hideCommonRouteDialog() {
@@ -320,7 +318,6 @@ function cloneDefaultCommonRoutes() {
 
 function renderTrips(trips) {
   elements.resultsList.textContent = '';
-  elements.resultCount.textContent = `${trips.length} 筆`;
   elements.emptyState.classList.toggle('hidden', trips.length > 0);
 
   if (trips.length === 0) {
@@ -331,8 +328,8 @@ function renderTrips(trips) {
 
   for (const trip of trips) {
     const card = elements.tripTemplate.content.cloneNode(true);
-    card.querySelector('.train-type').textContent = trip.trainType || '台鐵列車';
-    card.querySelector('.train-route').textContent = `${trip.startingStationName || '起點'} → ${trip.endingStationName || '終點'}`;
+    card.querySelector('.train-type').textContent = simplifyTrainType(trip.trainType);
+    card.querySelector('.train-route').textContent = `${trip.departureStationName || '起站'} → ${trip.arrivalStationName || '訖站'}`;
     card.querySelector('.train-no').textContent = trip.trainNo ? `車次 ${trip.trainNo}` : '車次未提供';
     card.querySelector('.departure-time').textContent = trip.departureTime || '--:--';
     card.querySelector('.arrival-time').textContent = trip.arrivalTime || '--:--';
@@ -340,12 +337,13 @@ function renderTrips(trips) {
     card.querySelector('.arrival-station').textContent = trip.arrivalStationName || '';
     card.querySelector('.duration').textContent = formatDuration(trip.durationMinutes, trip.stopCount);
 
-    const note = card.querySelector('.trip-note');
-    note.textContent = trip.note || '';
-    note.classList.toggle('hidden', !trip.note);
-
     elements.resultsList.append(card);
   }
+}
+
+function simplifyTrainType(trainType) {
+  const value = String(trainType || '台鐵列車');
+  return value.split(/[（(]/)[0] || value;
 }
 
 function resolveStation(value) {

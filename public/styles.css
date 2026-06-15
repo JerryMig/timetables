@@ -324,18 +324,6 @@ h2 {
   padding-bottom: 18px;
 }
 
-.count-pill {
-  display: inline-flex;
-  align-items: center;
-  min-height: 34px;
-  border-radius: 999px;
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-  font-weight: 800;
-  padding: 0 14px;
-  white-space: nowrap;
-}
-
 .empty-state {
   padding: 56px 16px;
   text-align: center;
@@ -357,7 +345,7 @@ h2 {
   overflow: hidden;
   border: 1px solid #b7c9d8;
   border-radius: 8px;
-  padding: 18px;
+  padding: 18px 18px 18px 22px;
   background: #edf5fb;
 }
 
@@ -371,28 +359,26 @@ h2 {
   content: "";
 }
 
-.trip-main,
-.time-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 18px;
-}
-
 .trip-main {
+  display: flex;
   align-items: start;
-  margin-bottom: 18px;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
 }
 
 .train-type {
   margin-bottom: 4px;
   color: var(--accent);
-  font-size: 0.86rem;
+  font-size: 1.15rem;
   font-weight: 800;
 }
 
 .train-route {
   margin-bottom: 0;
-  font-size: 1.08rem;
+  color: var(--text);
+  font-size: 1.05rem;
+  font-weight: 800;
 }
 
 .train-no {
@@ -405,6 +391,9 @@ h2 {
 }
 
 .time-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 14px;
   align-items: center;
 }
 
@@ -424,25 +413,24 @@ h2 {
 .arrival-time {
   display: block;
   margin: 3px 0;
-  font-size: 1.75rem;
+  color: var(--text);
+  font-size: 1.9rem;
   line-height: 1;
 }
 
-.duration {
-  flex: 0 0 auto;
-  border-top: 2px solid var(--line);
-  color: var(--muted);
-  font-size: 0.9rem;
-  font-weight: 800;
-  min-width: 120px;
-  padding-top: 8px;
-  text-align: center;
+.time-row > div:last-child {
+  text-align: right;
 }
 
-.trip-note {
-  margin: 16px 0 0;
-  color: var(--warning);
-  font-size: 0.92rem;
+.duration {
+  border-radius: 999px;
+  background: #fff;
+  color: var(--accent-strong);
+  font-size: 0.9rem;
+  font-weight: 800;
+  min-width: 96px;
+  padding: 8px 10px;
+  text-align: center;
 }
 
 .hidden {
@@ -513,8 +501,7 @@ h2 {
   .route-shortcuts,
   .route-shortcut-header,
   .results-header,
-  .trip-main,
-  .time-row {
+  .trip-main {
     align-items: stretch;
     flex-direction: column;
   }
@@ -579,9 +566,15 @@ h2 {
     font-size: 1.55rem;
   }
 
+  .time-row {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 8px;
+  }
+
   .duration {
     min-width: 0;
-    text-align: left;
+    padding: 7px 8px;
+    white-space: nowrap;
   }
 
   .route-dialog {

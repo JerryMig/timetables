@@ -56,7 +56,7 @@ app.get('/api/timetable', async (req, res) => {
     const to = normalizeStationId(req.query.to);
     const date = String(req.query.date || '');
     const time = String(req.query.time || '00:00');
-    const limit = Math.min(Math.max(Number(req.query.limit || 20), 1), 80);
+    const limit = Math.min(Math.max(Number(req.query.limit || 30), 1), 80);
 
     if (!from || !to) {
       return res.status(400).json({ message: '請選擇起站與訖站。' });
@@ -192,7 +192,6 @@ function normalizeTimetableEntry(entry, from, to) {
     trainNo: trainInfo.TrainNo,
     trainType: localizedName(trainInfo.TrainTypeName),
     direction: trainInfo.Direction,
-    note: localizedName(trainInfo.Note),
     startingStationName: localizedName(trainInfo.StartingStationName),
     endingStationName: localizedName(trainInfo.EndingStationName),
     departureStationName: localizedName(fromStop.StationName),
