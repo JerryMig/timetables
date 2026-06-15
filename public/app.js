@@ -73,7 +73,7 @@ async function loadStatus() {
 
 async function loadStations() {
   try {
-    setLoading(true, '載入車站清單中...');
+    setLoading(true);
     const data = await getJson('/api/stations');
     stations = data.stations || [];
     stationByOptionValue = new Map();
@@ -91,7 +91,7 @@ async function loadStations() {
     }
 
     renderCommonRoutes();
-    setStatus(`已載入 ${stations.length} 個台鐵車站。`);
+    clearStatus();
   } catch (error) {
     setStatus(error.message, 'error');
   } finally {
@@ -421,6 +421,10 @@ function setLoading(isLoading, message = '') {
 function setStatus(message, type = '') {
   elements.statusMessage.textContent = message;
   elements.statusMessage.className = `status-message ${type}`.trim();
+}
+
+function clearStatus() {
+  setStatus('');
 }
 
 async function getJson(url) {
